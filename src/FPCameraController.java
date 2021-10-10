@@ -1,7 +1,4 @@
-/**
- *
- * @author ed144
- */
+
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
