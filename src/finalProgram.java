@@ -1,7 +1,4 @@
-/**
- *
- * @author ed144
- */
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
