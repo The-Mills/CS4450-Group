@@ -13,50 +13,73 @@ public class FPCameraController {
     private float yaw = 0.0f;
     private float pitch = 0.0f;
     
-    public FPCameraController(float x, float y, float z){
+    private static final float MOUSE_SENSITIVITY = 0.09f;
+    private static final float MOVEMENT_SPEED    = 0.35f;
+    
+    public FPCameraController(float x, float y, float z)
+    {
         position = new Vector3f(x,y,z);
         lPosition = new Vector3f(x,y,z);
         lPosition.x = 0f;
         lPosition.y = 15f;
         lPosition.z = 0f;
+        
+        Mouse.setGrabbed(true);
     }
     
-    public void yaw(float amount){
+    public void yaw(float amount)
+    {
         yaw += amount;
     }
-    public void pitch (float amount){
+    
+    public void pitch (float amount)
+    {
         pitch -= amount;
     }
-    public void walkForward(float distance){
+    
+    public void walkForward(float distance)
+    {
         float xOffset = distance * (float)Math.sin(Math.toRadians(yaw));
         float zOffset = distance * (float)Math.cos(Math.toRadians(yaw));
         position.x -= xOffset;position.z+= zOffset;
     }
-    public void walkBackwards(float distance){
+    
+    public void walkBackwards(float distance)
+    {
         float xOffset = distance * (float)Math.sin(Math.toRadians(yaw));
         float zOffset = distance * (float)Math.cos(Math.toRadians(yaw));
         position.x += xOffset;
         position.z -= zOffset;
     }
-    public void strafeLeft(float distance){
+    
+    public void strafeLeft(float distance)
+    {
         float xOffset = distance * (float)Math.sin(Math.toRadians(yaw-90));
         float zOffset = distance * (float)Math.cos(Math.toRadians(yaw-90));
         position.x -= xOffset;
         position.z += zOffset;
     }
-    public void strafeRight(float distance){
+    
+    public void strafeRight(float distance)
+    {
         float xOffset = distance * (float)Math.sin(Math.toRadians(yaw+90));
         float zOffset = distance * (float)Math.cos(Math.toRadians(yaw+90));
         position.x -= xOffset;
         position.z += zOffset;
     }
-    public void moveUp(float distance){
+    
+    public void moveUp(float distance)
+    {
         position.y -= distance;
     }
-    public void moveDown(float distance){
+    
+    public void moveDown(float distance)
+    {
         position.y += distance;
     }
-    public void lookThrough(){
+    
+    public void lookThrough()
+    {
         //roatatethe pitch around the X axis
         glRotatef(pitch, 1.0f, 0.0f, 0.0f);
         //roatatethe yaw around the Y axis
@@ -64,56 +87,52 @@ public class FPCameraController {
         //translate to the position vector's location
         glTranslatef(position.x, position.y, position.z);
     }
-    public void gameLoop(){
-        FPCameraController camera = new FPCameraController(0, 0, 0);
-        float dx = 0.0f;
-        float dy = 0.0f;
-        float dt = 0.0f; //length of frame
-        float lastTime = 0.0f; // when the last frame was
+    
+    public void gameLoop()
+    {
+        float dx, dy, dt, lastTime;
         long time = 0;
-        float mouseSensitivity = 0.09f;
-        float movementSpeed = .35f;//hide the mouse
-        Mouse.setGrabbed(true);
         
-        while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
+        while (!Display.isCloseRequested() && !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+        {
             time = Sys.getTime();
             lastTime = time;
             dx = Mouse.getDX();
             dy = Mouse.getDY();
             
-            camera.yaw(dx * mouseSensitivity);
-            camera.pitch(dy * mouseSensitivity);
+            yaw(dx * MOUSE_SENSITIVITY);
+            pitch(dy * MOUSE_SENSITIVITY);
             
             if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
-                camera.walkForward(movementSpeed);
+                walkForward(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
-                camera.walkBackwards(movementSpeed);
+                walkBackwards(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
-                camera.strafeLeft(movementSpeed);
+                strafeLeft(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right  
-                camera.strafeRight(movementSpeed);
+                strafeRight(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))//move up     
-                camera.moveUp(movementSpeed);
+                moveUp(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_E))
-                camera.moveDown(movementSpeed);
+                moveDown(MOVEMENT_SPEED);
             
             //set the modelviewmatrix back to the identity
             glLoadIdentity();
             //look through the camera before you draw anything
-            camera.lookThrough();
+            lookThrough();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             //you would draw your scene here.
             render();
             //draw the buffer to the screen 
             Display.update();
             Display.sync(60);
-        
         }
     }
     
-    
-    private void render(){
-        try{
+    private void render()
+    {
+        try
+        {
             glBegin(GL_QUADS);
             glColor3f(1.0f,0.0f,1.0f);
             glVertex3f( 1.0f,-1.0f,-1.0f);
@@ -121,7 +140,9 @@ public class FPCameraController {
             glVertex3f(-1.0f, 1.0f,-1.0f);
             glVertex3f( 1.0f, 1.0f,-1.0f); 
             glEnd();
-        }catch(Exception e){
+        }
+        catch(Exception e)
+        {
         }
     }       
 

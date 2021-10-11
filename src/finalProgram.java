@@ -9,53 +9,26 @@ public class finalProgram {
     
     private FPCameraController fp = new FPCameraController(0f,0f,0f);
     private DisplayMode displayMode;
-    public void createWindow() throws Exception {
+    
+    public void createWindow() throws Exception 
+    {
         Display.setFullscreen(false);
         DisplayMode d[] = Display.getAvailableDisplayModes();
         
         for (int i = 0; i < d.length; i++){
-            if (d[i].getWidth() == 640 && d[i].getHeight() == 480 && d[i].getBitsPerPixel() == 32){
+            if (d[i].getWidth() == 640 && d[i].getHeight() == 480 && d[i].getBitsPerPixel() == 32)
+            {
                 displayMode = d[i];
                 break;
             }
         }
-        
         Display.setDisplayMode(displayMode);
         Display.setTitle("Final Program");
-        Display.create();
-        
-    }
-    private void render(){
-        
-        //while(!Display.isCloseRequested()){
-            while(!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
-            try{
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                glLoadIdentity();
-
-                glColor3f(0.0f, 1.0f, 0.0f);
-                glPointSize(1);
-
-                
-                    glBegin(GL_POINTS);
-                        
-                    glEnd();
-
-
-                Display.update();
-                Display.sync(60);
-                
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        //}
-        }
-        Display.destroy();
+        Display.create();    
     }
     
-
-    private void initGL(){
+    private void initGL()
+    {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
         glMatrixMode(GL_PROJECTION);
@@ -68,8 +41,10 @@ public class finalProgram {
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     }
     
-    public void start(){
-        try{
+    public void start()
+    {
+        try
+        {
             createWindow();
             initGL();
             fp.gameLoop();
@@ -80,9 +55,9 @@ public class finalProgram {
         }
     }
     
-    public static void main(String[] args){
+    public static void main(String[] args)
+    {
         finalProgram test = new finalProgram();
         test.start();
-
     }   
 }
