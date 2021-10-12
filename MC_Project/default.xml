@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config>
+<opengl>
+	<window>
+		<title>Not Minecraft</title>
+		<width>640</width>
+		<height>480</height>
+		<bitdepth>32</bitdepth>
+	</window>
+</opengl>
+<engine>
+	<refresh>60</refresh>
+</engine>
+<controlls>
+	<movement>
+		<forward>W</forward>
+		<backward>S</backward>
+		<left>A</left>
+		<right>D</right>
+		<up>SPACE</up>
+		<down>LSHIFT</down>
+	</movement>
+	<sensitivity>
+		<pitch>0.09</pitch>
+		<yaw>0.09</yaw>
+	</sensitivity>
+</controlls>
+</config>
