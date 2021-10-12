@@ -1,4 +1,3 @@
-
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -103,17 +102,17 @@ public class FPCameraController {
             yaw(dx * MOUSE_SENSITIVITY);
             pitch(dy * MOUSE_SENSITIVITY);
             
-            if (Keyboard.isKeyDown(Keyboard.KEY_W))//move forward
+            if (Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP))//move forward
                 walkForward(MOVEMENT_SPEED);
-            if (Keyboard.isKeyDown(Keyboard.KEY_S))//move backwards
+            if (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN))//move backwards
                 walkBackwards(MOVEMENT_SPEED);
-            if (Keyboard.isKeyDown(Keyboard.KEY_A))//strafe left
+            if (Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT))//strafe left
                 strafeLeft(MOVEMENT_SPEED);
-            if (Keyboard.isKeyDown(Keyboard.KEY_D))//strafe right  
+            if (Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT))//strafe right  
                 strafeRight(MOVEMENT_SPEED);
             if (Keyboard.isKeyDown(Keyboard.KEY_SPACE))//move up     
                 moveUp(MOVEMENT_SPEED);
-            if (Keyboard.isKeyDown(Keyboard.KEY_E))
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT))
                 moveDown(MOVEMENT_SPEED);
             
             //set the modelviewmatrix back to the identity
@@ -133,12 +132,51 @@ public class FPCameraController {
     {
         try
         {
+            glEnable(GL_CULL_FACE);
             glBegin(GL_QUADS);
+            
+            //Top
+            glColor3f(0.0f,0.0f,1.0f);
+            glVertex3f( 2.0f, 2.0f,-6.0f);
+            glVertex3f(-2.0f, 2.0f,-6.0f);
+            glVertex3f(-2.0f, 2.0f, -2.0f);
+            glVertex3f( 2.0f, 2.0f, -2.0f);  
+
+            //Bottom
+            glColor3f(0.0f,1.0f,0.0f);
+            glVertex3f( 2.0f,-2.0f, -2.0f);
+            glVertex3f(-2.0f,-2.0f, -2.0f);
+            glVertex3f(-2.0f,-2.0f,-6.0f);
+            glVertex3f( 2.0f,-2.0f,-6.0f);
+
+            //Front
+            glColor3f(1.0f,0.0f,0.0f);
+            glVertex3f( 2.0f, 2.0f, -2.0f);
+            glVertex3f(-2.0f, 2.0f, -2.0f);
+            glVertex3f(-2.0f,-2.0f, -2.0f);
+            glVertex3f( 2.0f,-2.0f, -2.0f);
+
+            //Back
+            glColor3f(0.0f,1.0f,1.0f);
+            glVertex3f( 2.0f,-2.0f,-6.0f);
+            glVertex3f(-2.0f,-2.0f,-6.0f);
+            glVertex3f(-2.0f, 2.0f,-6.0f);
+            glVertex3f( 2.0f, 2.0f,-6.0f);
+
+            //Right
             glColor3f(1.0f,0.0f,1.0f);
-            glVertex3f( 1.0f,-1.0f,-1.0f);
-            glVertex3f(-1.0f,-1.0f,-1.0f);
-            glVertex3f(-1.0f, 1.0f,-1.0f);
-            glVertex3f( 1.0f, 1.0f,-1.0f); 
+            glVertex3f( 2.0f, 2.0f,-6.0f);
+            glVertex3f( 2.0f, 2.0f, -2.0f);
+            glVertex3f( 2.0f,-2.0f, -2.0f);
+            glVertex3f( 2.0f,-2.0f,-6.0f);
+
+            //Left
+            glColor3f(1.0f,1.0f,0.0f);
+            glVertex3f(-2.0f, 2.0f, -2.0f);
+            glVertex3f(-2.0f, 2.0f,-6.0f);
+            glVertex3f(-2.0f,-2.0f,-6.0f);
+            glVertex3f(-2.0f,-2.0f, -2.0f);
+            
             glEnd();
         }
         catch(Exception e)
