@@ -3,14 +3,14 @@
 <opengl>
 	<window>
 		<title>Not Minecraft</title>
-		<width>1280</width>
-		<height>720</height>
+		<width>1920</width>
+		<height>1080</height>
 		<bitdepth>32</bitdepth>
 	</window>
 </opengl>
 <engine>
    <blockTexture>default.png</blockTexture>
-   <refresh>60</refresh>
+   <refresh>300</refresh>
    <showFPS>false</showFPS>
 </engine>
 <controlls>
