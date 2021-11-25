@@ -20,12 +20,13 @@ import static org.lwjgl.opengl.GL15.*;
 
 
 
+
 public class Chunks {
     
-    static final int CHUNK_SIZE[] ={30,180,30}; //x z y 
-    static final int CUBE_LENGTH = 2;
+    public static final int CHUNK_SIZE[] ={16,180,16}; //x z y 
+    public static final int CUBE_LENGTH = 2;
     
-    private Block[][][] Blocks;
+    public Block[][][] Blocks;
     private int VBOVertexHandle;
     private int VBOColorHandle;
     private int VBOTextureHandle;
@@ -84,7 +85,6 @@ public class Chunks {
         growSand();
         growSand();
         
-        
         cullHiddenBlocks();
         
         
@@ -94,23 +94,35 @@ public class Chunks {
     //method: render
     //purpose: renders the chunk
     public void render() {
-        if(built) {
-            glBindBuffer(GL_ARRAY_BUFFER, VBOVertexHandle);
-            glVertexPointer(3, GL_FLOAT, 0, 0L);
-            glBindBuffer(GL_ARRAY_BUFFER, VBOColorHandle);
-            glColorPointer(3,GL_FLOAT, 0, 0L);
-            glBindBuffer(GL_ARRAY_BUFFER, VBOTextureHandle);
-            glBindTexture(GL_TEXTURE_2D, 1);
-            glTexCoordPointer(2,GL_FLOAT,0,0L);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOVertexHandle);
+        glVertexPointer(3, GL_FLOAT, 0, 0L);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOColorHandle);
+        glColorPointer(3,GL_FLOAT, 0, 0L);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOTextureHandle);
+        glTexCoordPointer(2,GL_FLOAT,0,0L);
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            glDrawArrays(GL_QUADS, 0, CHUNK_SIZE[0]*CHUNK_SIZE[1]*CHUNK_SIZE[2]*24);
-        }
+        glDrawArrays(GL_QUADS, 0, CHUNK_SIZE[0]*CHUNK_SIZE[1]*CHUNK_SIZE[2]*24);
+    }
+    
+    public void initRender() {
+        glBindBuffer(GL_ARRAY_BUFFER, VBOVertexHandle);
+        glVertexPointer(3, GL_FLOAT, 0, 0L);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOColorHandle);
+        glColorPointer(3,GL_FLOAT, 0, 0L);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOTextureHandle);
+        glBindTexture(GL_TEXTURE_2D, 1);
+        glTexCoordPointer(2,GL_FLOAT,0,0L);
+        
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     }
     
     public void loadMesh() {
+        VertexPositionData.clear();
+        VertexTextureData.clear();
+        VertexColorData.clear();
+        
         for(int x = 0; x < CHUNK_SIZE[0]; x++) {
             for(int z = 0; z < CHUNK_SIZE[2]; z++) {
                 for(int y = 0; y < CHUNK_SIZE[1]; y++) {
@@ -122,6 +134,20 @@ public class Chunks {
                 }
             }
         }
+        
+        VertexColorData.flip();
+        VertexPositionData.flip();
+        VertexTextureData.flip();
+        
+        glBindBuffer(GL_ARRAY_BUFFER, VBOVertexHandle);
+        glBufferData(GL_ARRAY_BUFFER, VertexPositionData, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOColorHandle);
+        glBufferData(GL_ARRAY_BUFFER, VertexColorData, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOTextureHandle);
+        glBufferData(GL_ARRAY_BUFFER, VertexTextureData,GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     //method: rebuildMesh
@@ -161,9 +187,6 @@ public class Chunks {
         glBufferData(GL_ARRAY_BUFFER, VertexTextureData,GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         
-        VertexPositionData = null;
-        VertexColorData = null;
-        VertexTextureData = null;
 
     }
     
@@ -218,8 +241,10 @@ public class Chunks {
     
     //method: getCubeColor
     //purpose: returns the color of the cube based on the block type
+    //         now has been changed to deal with lighting 
     private float[] getCubeColor(Block block) {
-        return new float[]{1f,1f,1f}; 
+        return new float[]{.2f+(.1f*block.getBrightness()),.2f+(.1f*block.getBrightness()),.2f+(.1f*block.getBrightness())}; 
+        
     }
     
     
@@ -434,10 +459,13 @@ public class Chunks {
     //method: placeDirt
     //purpose: places 3 drit blocks under the surface grass blocks
     private void placeDirt(int depth) {
+        int orignalDepth = depth;
         for(int x = 0; x< CHUNK_SIZE[0]; x++) {
             for(int z = 0; z < CHUNK_SIZE[2]; z++) {
                 for(int y = CHUNK_SIZE[1]-1; y > depth+1; y--) {
                     if(Blocks[x][y][z].GetID() == 1) {
+                        if(y > 53) depth = 1;
+                        else depth = orignalDepth;
                         int i = 0;
                         while(i < depth) {
                             y--;
@@ -464,6 +492,8 @@ public class Chunks {
         }
     }
     
+    //method: placeSand
+    //purpose: replaces dirt/grass with sand if it touches water
     //method: placeSand
     //purpose: replaces dirt/grass with sand if it touches water
     private void placeSand() {
@@ -589,14 +619,13 @@ public class Chunks {
         
     }
     
-    
     //method: cullHiddenBlocks
     //purpose: finds blocks that are hidden and set visability to false
     private void cullHiddenBlocks() {
         for(int x = 0; x< CHUNK_SIZE[0]; x++) {
             for(int y = 0; y < CHUNK_SIZE[1]; y++) {
                 for(int z = 0; z < CHUNK_SIZE[2]; z++) {
-                    if(Blocks[x][y][z].GetID() != 0) {
+                    if(Blocks[x][y][z].GetID() != 0 && Blocks[x][y][z].GetID() != 3) {
                         Blocks[x][y][z].setVisibility(true);
                         if(z > 0 && Blocks[x][y][z-1].GetID() != 0 && Blocks[x][y][z-1].GetID() != 3) { //check front
                             if(z < CHUNK_SIZE[2]-1 && Blocks[x][y][z+1].GetID() != 0 && Blocks[x][y][z+1].GetID() != 3) { //check back
@@ -612,14 +641,99 @@ public class Chunks {
                             }
                         }
                     }
+                    else if(Blocks[x][y][z].GetID() == 3) {
+                        Blocks[x][y][z].setVisibility(true);
+                    }
                     else {
                         Blocks[x][y][z].setVisibility(false);
                     }
-                    if(Blocks[x][y][z].GetID() == 3) {
-                        Blocks[x][y][z].setVisibility(true);
-                    }
                 }
             }
+        }
+    }
+    
+    public void placeStoneAt(int x, int y, int z) {//places stone at coordinates in front of player
+        int origX = x, origY = y, origZ = z;
+        if (x < 0 && x > -29.5){// converts the actual position to x array index
+            //x = (x + 29) / 2;
+            x = (x * -1) / 2;
+        }
+        else if (x < 2 && x > 0){
+            //x = (x + 29) / 2;
+            x = x * -1 + 2;
+        }
+        else if (x < 34 && x > 2){
+            //x = (x - 3) / 2;
+            x = -1 * x/2 + 16;
+        }
+        else if (x < 66 && x > 34){
+            x = -1 * x/2 + 32;
+        }
+        else if (x < 98 && x > 66){
+            x = -1 * x/2 + 48;
+        }
+        else if (x < 130 && x > 98){
+            x = -1 * x/2 + 65;
+        }
+        else if (x < 162 && x > 130){
+            x = -1 * x/2 + 81;
+        }
+        else if (x < 194 && x > 162){
+            x = -1 * x/2 + 97;
+        }
+        else if (x < 226 && x > 194){
+            x = -1 * x/2 + 113;
+        }
+        else if (x < 258 && x > 226){
+            x = -1 * x/2 + 129;
+        }
+        else if (x < 290 && x > 258){
+            x = -1 * x/2 + 145;
+        }
+        
+        y = y * (-1) / 2; // converts the actual position to y array index
+        
+        if (z < 0 && z > -29.5){// converts the actual position to z array index
+            z = (z * -1) / 2;
+        }
+        else if (z < 2 && z > 0){
+            //x = (x + 29) / 2;
+            z = z * -1 + 2;
+        }
+        else if (z < 34 && z > 2){
+            z = -1 * z/2 + 16;
+        }
+        else if (z < 66 && z > 34){
+            z = -1 * z/2 + 32;
+        }
+        else if (z < 98 && z > 66){
+            z = -1 * z/2 + 48;
+        }
+        else if (z < 130 && z > 98){
+            z = -1 * z/2 + 65;
+        }
+        else if (z < 162 && z > 130){
+            z = -1 * z/2 + 81;
+        }
+        else if (z < 194 && z > 162){
+            z = -1 * z/2 + 97;
+        }
+        else if (z < 226 && z > 194){
+            z = -1 * z/2 + 113;
+        }
+        else if (z < 258 && z > 226){
+            z = -1 * z/2 + 129;
+        }
+        else if (z < 290 && z > 258){
+            z = -1 * z/2 + 145;
+        }
+        
+        
+        if (origX > -29.5 && origX < 290 && origZ > -29.5 && origZ < 290){// places blocks only if they are within 10x10 grid
+            VertexPositionData.put(createCube((float) origX, (float) origY, (float) origZ));
+            VertexTextureData.put(createTexCube((float) 0, (float) 0,Blocks[x][y][z]));
+            VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[x][y][z])));
+            Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
         }
     }
     
@@ -650,4 +764,7 @@ public class Chunks {
         return CHUNK_SIZE;
     }
     
+    public int getBlocksID(int x, int y, int z){
+        return Blocks[x][y][z].GetID();
+    }
 }
