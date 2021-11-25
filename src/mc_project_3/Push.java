@@ -154,7 +154,7 @@ public class Push
             }
         }
         
-        Push.out(messageStr);
+        //Push.out(messageStr);
     }
     public static void out(boolean[][] message) 
     {
