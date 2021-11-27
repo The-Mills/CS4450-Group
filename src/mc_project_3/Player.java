@@ -25,7 +25,10 @@ public class Player
     
     private float yaw = 0.0f; //rotation around Y axis
     private float pitch = 45.0f; //rotation around x axis 
+    private float pitch1 = -45.0f; //used for calculations
     
+    
+   
     //method: Player
     //purpose: Init Player object
     public Player (float x, float y, float z) 
@@ -39,6 +42,10 @@ public class Player
     public void yaw(float distance) 
     {
         yaw += distance;
+        if (yaw > 360)
+            yaw = yaw - 360;
+        else if (yaw < 0)
+            yaw = yaw + 360;
     }
     
     //method: pitch
@@ -46,6 +53,12 @@ public class Player
     public void pitch(float distance) 
     {
         pitch -= distance;
+        pitch1 += distance;
+        
+        if (pitch1 > 360)
+            pitch1 = pitch1 - 360;
+        else if (pitch1 < 0)
+            pitch1 = pitch1 + 360;
     }
     
     //method: walkForward
@@ -88,13 +101,15 @@ public class Player
     //purpose: moves the player up X distance
     public void moveUp(float distance)
     {
-        position.y-= distance; 
+        //if (position.y != )
+            position.y-= distance; 
     }
     
     //method: moveDown
     //purpose: moves the player down X distance
     public void moveDown(float distance)
     {
+        //if (position.y != )
         position.y+= distance;
     }
     
@@ -108,6 +123,67 @@ public class Player
         glRotatef(yaw, 0.0f, 1.0f, 0.0f);
         //translate vect loc
         glTranslatef(position.x, position.y, position.z);
+    }
+    
+    public void teleport(int dist){//allows user to teleport in direction of camera
+        float yDiff, hyp, pitchNum = pitch1;
+        
+        yDiff = dist * (float) Math.sin(Math.toRadians(pitchNum));
+        hyp = dist * (float) Math.cos(Math.toRadians(pitchNum));
+        
+        walkForward(hyp);// sending horizontal distance to walk forward method
+        if (yDiff < 0)//sending vertical distance to move up/down method
+            moveDown(-yDiff);
+        else if (yDiff > 0)
+            moveUp(yDiff);
+        
+    }
+    
+    public void placeBlock(int dist){//places block in front of player
+        float blockPosX, blockPosY, blockPosZ, yDiff, hyp, yawNum = yaw, pitchNum = pitch1;
+        
+        yDiff = dist * (float) Math.sin(Math.toRadians(pitchNum));
+        hyp = dist * (float) Math.cos(Math.toRadians(pitchNum));
+        
+        float xOffset= hyp * (float)Math.sin(Math.toRadians(yawNum));
+        float zOffset= hyp * (float)Math.cos(Math.toRadians(yawNum));
+        
+        blockPosX = position.x - xOffset;// calculates X for block
+        blockPosZ = position.z + zOffset;// calculates z for block
+        if (yDiff < 0)// calculates y for block
+            blockPosY = position.y - yDiff; 
+        else if (yDiff > 0)
+            blockPosY = position.y + yDiff; 
+        else
+            blockPosY = position.y;
+        
+        //rounding to nearest whole number
+        if (blockPosX % 2 > 1)
+            blockPosX = (float) Math.floor(blockPosX);
+        else 
+            blockPosX = (float) Math.ceil(blockPosX);
+        if (blockPosY % 2 > 1)
+            blockPosY = (float) Math.floor(blockPosY);
+        else 
+            blockPosY = (float) Math.ceil(blockPosY);
+        if (blockPosZ % 2 > 1)
+            blockPosZ = (float) Math.floor(blockPosZ);
+        else 
+            blockPosZ = (float) Math.ceil(blockPosZ);
+        
+        //sends block position
+        Engine.sendBlockInfo((int) blockPosX, (int) blockPosY, (int) blockPosZ);
+
+    }
+    
+    public float getPosX(){
+        return position.x;
+    }
+    public float getPosY(){
+        return position.y;
+    }
+    public float getPosZ(){
+        return position.z;
     }
     
     public Vector3f getPos() {
