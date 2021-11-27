@@ -384,6 +384,43 @@ public class Chunks {
                         blockRowR = 2;
                         blockColR = 2;
                         break;
+                case 7: blockRowU = 2;
+                        blockColU = 6;
+
+                        blockRowD = 2;
+                        blockColD = 6;
+
+                        blockRowF = 2;
+                        blockColF = 5;
+
+                        blockRowB = 2;
+                        blockColB = 5;
+
+                        blockRowL = 2;
+                        blockColL = 5;
+
+                        blockRowR = 2;
+                        blockColR = 5;
+                        break;
+
+                case 8: blockRowU = 4;
+                        blockColU = 6;
+
+                        blockRowD = 4;
+                        blockColD = 6;
+
+                        blockRowF = 4;
+                        blockColF = 6;
+
+                        blockRowB = 4;
+                        blockColB = 6;
+
+                        blockRowL = 4;
+                        blockColL = 6;
+
+                        blockRowR = 4;
+                        blockColR = 6;
+                        break;
 
                 default: break;
             }
